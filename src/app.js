@@ -8,9 +8,11 @@ var level = [
   [1, 0, 0, 1, 1, 1, 1],
   [1, 1, 1, 1, 1, 1, 1]
 ];
+//var map[] = level; // mapにlevelをコピーする
 var playerPosition; //マップ内のプレイやの位置(ｘ、ｙ)を保持する
 var playerSprite; //プレイヤーのスプライト
 var cratesArray = []; //配置した木箱のスプライトを配列に保持する
+var ddown = 2; // 穴
 
 var startTouch;
 var endTouch;
@@ -140,17 +142,23 @@ switch(level[playerPosition.y+deltaY][playerPosition.x+deltaX]){
         playerPosition.y+=deltaY;
         level[playerPosition.y][playerPosition.x]+=4;
         playerSprite.setPosition(165+25*playerPosition.x,185-25*playerPosition.y);
+
     break;
     case 3:
-    case 5:
+    case 5://プレイヤーの一つ先のマスが木箱が押した場所なら
         if(level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==0 ||
            level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==2){
+             //プレイヤーの２つ先のマスが２（穴）の場合
+             if(level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==2){
+                ddown--;//穴に入っている金箱のカウントを減らす
+             }
             level[playerPosition.y][playerPosition.x]-=4;
             playerPosition.x+=deltaX;
             playerPosition.y+=deltaY;
             level[playerPosition.y][playerPosition.x]+=1;
             playerSprite.setPosition(165+25*playerPosition.x,185-25*playerPosition.y);
             level[playerPosition.y+deltaY][playerPosition.x+deltaX]+=3;
+
             var movingCrate = cratesArray[playerPosition.y][playerPosition.x];
             movingCrate.setPosition(movingCrate.getPosition().x+25*deltaX,movingCrate.
             getPosition().y-25*deltaY);
@@ -158,5 +166,10 @@ switch(level[playerPosition.y+deltaY][playerPosition.x+deltaX]){
             cratesArray[playerPosition.y][playerPosition.x]=null;
         }
         break;
+    }
+    if(ddown == 0){
+      var label = cc.LabelTTF.create("GAME ", "Arial", 40);
+      label.setPosition(150,150);
+      //cc.director.runScene(new NextScene());
     }
 }
