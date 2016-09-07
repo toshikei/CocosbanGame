@@ -8,11 +8,11 @@ var level = [
   [1, 0, 0, 1, 1, 1, 1],
   [1, 1, 1, 1, 1, 1, 1]
 ];
-//var map[] = level; // mapにlevelをコピーする
 var playerPosition; //マップ内のプレイやの位置(ｘ、ｙ)を保持する
 var playerSprite; //プレイヤーのスプライト
 var cratesArray = []; //配置した木箱のスプライトを配列に保持する
-var ddown = 2; // 穴
+var ddown = 0; // 穴
+var audioMain;
 
 var startTouch;
 var endTouch;
@@ -21,6 +21,9 @@ var swipeTolerance = 10;//スワイプかを判断する閾値
 var gameScene = cc.Scene.extend({
   onEnter: function() {
     this._super();
+
+    /*audioMain = cc.audioMain;
+    audioMain.playMusic(res.game_bgm, true);*/
 
     var layer0 = new gameLayer();
     layer0.init();
@@ -148,28 +151,32 @@ switch(level[playerPosition.y+deltaY][playerPosition.x+deltaX]){
     case 5://プレイヤーの一つ先のマスが木箱が押した場所なら
         if(level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==0 ||
            level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==2){
-             //プレイヤーの２つ先のマスが２（穴）の場合
-             if(level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==2){
-                ddown--;//穴に入っている金箱のカウントを減らす
-             }
-            level[playerPosition.y][playerPosition.x]-=4;
+            level[playerPosition.y][playerPosition.x]-=4;//プレイヤーの場所がからのタイル（4-4=0）になる
             playerPosition.x+=deltaX;
             playerPosition.y+=deltaY;
-            level[playerPosition.y][playerPosition.x]+=1;
+            level[playerPosition.y][playerPosition.x]+=1;//木箱があった位置にプレイヤー（3+1=4）が移動
             playerSprite.setPosition(165+25*playerPosition.x,185-25*playerPosition.y);
-            level[playerPosition.y+deltaY][playerPosition.x+deltaX]+=3;
-
+            level[playerPosition.y+deltaY][playerPosition.x+deltaX]+=3;//からの床へ木箱が移動（3+0=3）
             var movingCrate = cratesArray[playerPosition.y][playerPosition.x];
             movingCrate.setPosition(movingCrate.getPosition().x+25*deltaX,movingCrate.
             getPosition().y-25*deltaY);
             cratesArray[playerPosition.y+deltaY][playerPosition.x+deltaX]=movingCrate;
             cratesArray[playerPosition.y][playerPosition.x]=null;
+
+            //プレイヤーの２つ先のマス（木箱がおかれる場所）が5の場合
+            if( level[playerPosition.y+deltaY][playerPosition.x+deltaX]==5 ){
+         ddown += 1;
+       }
+       if (ddown == 3){
+         console.log("クリア");
+         // ddownならgameclearへ
+         cc.director.runScene(new gameclear());
+
+              ddown = 0;
+            }
+
         }
         break;
     }
-    if(ddown == 0){
-      var label = cc.LabelTTF.create("GAME ", "Arial", 40);
-      label.setPosition(150,150);
-      //cc.director.runScene(new NextScene());
-    }
+
 }
