@@ -7,7 +7,7 @@ var gameclearLayer = cc.Layer.extend({
         var label = cc.LabelTTF.create("Game Clear!!", "Arial", 50);
         label.setPosition(size.width / 2, size.height * 3 / 6);
         this.addChild(label, 1);
-        gameoverText = cc.LabelTTF.create("リトライ？", "Arial", 32);
+        gameoverText = cc.LabelTTF.create("Next Stage!!", "Arial", 32);
         this.addChild(gameoverText);
         gameoverText.setPosition(size.width / 2, size.height * 2 / 6);
         // タップイベントリスナーを登録する
