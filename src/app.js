@@ -1,4 +1,9 @@
 var size;
+var level;
+
+var stage = 1;
+var ClearCount = 2;
+
 var level = [
   [1, 1, 1, 1, 1, 1, 1],
   [1, 1, 0, 0, 0, 0, 1],
@@ -8,25 +13,40 @@ var level = [
   [1, 0, 0, 1, 1, 1, 1],
   [1, 1, 1, 1, 1, 1, 1]
 ];
+init_map = [
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 0, 0, 0, 0, 1],
+        [1, 1, 3, 0, 2, 0, 1],
+        [1, 0, 0, 4, 0, 0, 1],
+        [1, 0, 3, 1, 2, 0, 1],
+        [1, 0, 0, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1]
+      ];
+
+
 var playerPosition; //マップ内のプレイやの位置(ｘ、ｙ)を保持する
 var playerSprite; //プレイヤーのスプライト
 var cratesArray = []; //配置した木箱のスプライトを配列に保持する
 var ddown = 0; // 穴
-var audioMain;
+var audioEngine;
 
 var startTouch;
 var endTouch;
 var swipeTolerance = 10;//スワイプかを判断する閾値
 
+var audioEngine = cc.audioEngine;
+
+
 var gameScene = cc.Scene.extend({
   onEnter: function() {
     this._super();
 
-    /*audioMain = cc.audioMain;
-    audioMain.playMusic(res.game_bgm, true);*/
-
     var layer0 = new gameLayer();
     layer0.init();
+
+    if (!audioEngine.isMusicPlaying()) {
+    audioEngine.playMusic(res.bgm, true);
+  }
     this.addChild(layer0);
 
   }
@@ -38,7 +58,7 @@ var gameLayer = cc.Layer.extend({
     //スプライトフレームのキャッシュオブジェクトを作成する
     cache = cc.spriteFrameCache;
     //スプライトフレームのデータを読み込む
-    cache.addSpriteFrames(res.spritesheet_plist);
+    cache.addSpriteFrames(res.spritesheet1_plist);
     var backgroundSprite = cc.Sprite.create(cache.getSpriteFrame("background.png"));
     //アンチエイリアス処理を止める
     backgroundSprite.getTexture().setAliasTexParameters();
@@ -76,9 +96,11 @@ var gameLayer = cc.Layer.extend({
             crateSprite.setScale(5);
             this.addChild(crateSprite);
             cratesArray[i][j] = crateSprite;//(i,j)の位置にcrateSpriteを入れる
+
             break;
           default:
             cratesArray[i][j] = null;//木箱のコード以外の場合は、その場所に木箱がない値としてnullを代入する
+
             break;
         }
       }
@@ -135,9 +157,8 @@ function swipeDirection(){
         }
     }
 }
-
 function move(deltaX,deltaY){
-switch(level[playerPosition.y+deltaY][playerPosition.x+deltaX]){
+  switch(level[playerPosition.y+deltaY][playerPosition.x+deltaX]){
     case 0:
     case 2:
         level[playerPosition.y][playerPosition.x]-=4;
@@ -145,38 +166,67 @@ switch(level[playerPosition.y+deltaY][playerPosition.x+deltaX]){
         playerPosition.y+=deltaY;
         level[playerPosition.y][playerPosition.x]+=4;
         playerSprite.setPosition(165+25*playerPosition.x,185-25*playerPosition.y);
-
     break;
     case 3:
-    case 5://プレイヤーの一つ先のマスが木箱が押した場所なら
+    case 5:
         if(level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==0 ||
            level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==2){
-            level[playerPosition.y][playerPosition.x]-=4;//プレイヤーの場所がからのタイル（4-4=0）になる
+            level[playerPosition.y][playerPosition.x]-=4;
             playerPosition.x+=deltaX;
             playerPosition.y+=deltaY;
-            level[playerPosition.y][playerPosition.x]+=1;//木箱があった位置にプレイヤー（3+1=4）が移動
+            level[playerPosition.y][playerPosition.x]+=1; //木箱の位置にプレイヤー
             playerSprite.setPosition(165+25*playerPosition.x,185-25*playerPosition.y);
-            level[playerPosition.y+deltaY][playerPosition.x+deltaX]+=3;//からの床へ木箱が移動（3+0=3）
+            level[playerPosition.y+deltaY][playerPosition.x+deltaX]+=3;//木箱(3)の移動先
+
             var movingCrate = cratesArray[playerPosition.y][playerPosition.x];
             movingCrate.setPosition(movingCrate.getPosition().x+25*deltaX,movingCrate.
             getPosition().y-25*deltaY);
             cratesArray[playerPosition.y+deltaY][playerPosition.x+deltaX]=movingCrate;
             cratesArray[playerPosition.y][playerPosition.x]=null;
-
-            //プレイヤーの２つ先のマス（木箱がおかれる場所）が5の場合
-            if( level[playerPosition.y+deltaY][playerPosition.x+deltaX]==5 ){
-         ddown += 1;
-       }
-       if (ddown == 3){
-         console.log("クリア");
-         // ddownならgameclearへ
-         cc.director.runScene(new gameclear());
-
-              ddown = 0;
-            }
-
         }
         break;
     }
-
+    complete_check()      //クリアの確認
+}
+    function reset(){
+      for (var i = 0; i < 7; i++){
+        for (var j = 0; j < 7; j++){
+          switch (level[i][j]) {
+            case 4:
+            case 6:
+              playerSprite.setPosition(165 + 25 * j, 185 - 25 * i);
+              playerPosition = {
+                x: j,
+                y: i
+              };
+              break;
+            case 3:
+            case 5:
+              var crateSprite = cratesArray[i][j];
+              crateSprite.setPosition(165 + 25 * j, 185 - 25 * i);
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    }
+    function complete_check(){
+  var game_f = 0;
+  for (var i = 0; i < 7; i++) {
+    for (var j = 0; j < 7; j++) {
+      if (level[i][j] == 5) game_f +=1;
+    }
+  }
+  console.log(gameclear);
+  if (game_f == ClearCount){
+    stage = stage + 1;
+    if (audioEngine.isMusicPlaying()) {
+      audioEngine.stopMusic();
+    }
+    cc.director.runScene(new gameclear());
+    if(stage == 4){
+      stage = 1;
+  }
+}
 }

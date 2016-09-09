@@ -26,6 +26,8 @@ var gameclearLayer = cc.Layer.extend({
     onTouchMoved: function(touch, event) {},
     onTouchEnded: function(touch, event) {
         cc.director.runScene(new gameScene());
+        if(stage  == 1){
+          ClearCount = 2;
         level = [
           [1, 1, 1, 1, 1, 1, 1],
           [1, 1, 0, 0, 0, 0, 1],
@@ -35,8 +37,40 @@ var gameclearLayer = cc.Layer.extend({
           [1, 0, 0, 1, 1, 1, 1],
           [1, 1, 1, 1, 1, 1, 1]
         ];
-    },
+        init_map = [            // 初期化マップ配列
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 0, 0, 0, 0, 1],
+            [1, 1, 3, 0, 2, 0, 1],
+            [1, 0, 0, 4, 0, 0, 1],
+            [1, 0, 3, 1, 2, 0, 1],
+            [1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1]
+          ];
+        } else if(stage  == 2){
+          ClearCount = 4;
+          level = [
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 0, 2, 0, 0, 1],
+            [1, 1, 0, 0, 3, 0, 1],
+            [1, 0, 0, 4, 0, 0, 1],
+            [1, 0, 3, 1, 0, 0, 1],
+            [1, 0, 2, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1]
+          ];
+          init_map = [
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 0, 2, 0, 0, 1],
+            [1, 1, 0, 0, 3, 0, 1],
+            [1, 0, 0, 4, 0, 0, 1],
+            [1, 0, 3, 1, 0, 0, 1],
+            [1, 0, 2, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1]
+          ];
+        }
+      },
+
 });
+
 
 
 var gameclear = cc.Scene.extend({

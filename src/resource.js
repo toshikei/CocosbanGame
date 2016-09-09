@@ -1,8 +1,9 @@
 var res = {
-    spritesheet_plist : "res/spritesheet.plist",
+    spritesheet1_plist : "res/spritesheet.plist",
     spritesheet_png : "res/spritesheet.png",
-    //bame_bgm : "res/drumn.mp3"
-
+    bgm : "res/drumn.mp3",
+    back_png: "res/background.png",
+    player_img: "res/player.png",
 };
 
 
