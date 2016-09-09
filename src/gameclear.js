@@ -48,7 +48,7 @@ var gameclearLayer = cc.Layer.extend({
           ];
         } else if(stage  == 2){
           ClearCount = 4;
-          level = [
+          level = [     // 2つ目のマップ
             [1, 1, 1, 1, 1, 1, 1],
             [1, 1, 0, 2, 0, 0, 1],
             [1, 1, 0, 0, 3, 0, 1],
@@ -57,7 +57,7 @@ var gameclearLayer = cc.Layer.extend({
             [1, 0, 2, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1]
           ];
-          init_map = [
+          init_map = [ // 2つ目のマップの初期化配列
             [1, 1, 1, 1, 1, 1, 1],
             [1, 1, 0, 2, 0, 0, 1],
             [1, 1, 0, 0, 3, 0, 1],
@@ -72,6 +72,8 @@ var gameclearLayer = cc.Layer.extend({
 });
 
 
+/* var gc = cc.TransitionFadeDown.create(0.5, new gameScene());
+cc.director.runScene(gc); */
 
 var gameclear = cc.Scene.extend({
     onEnter: function() {

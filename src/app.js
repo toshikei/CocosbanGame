@@ -169,6 +169,8 @@ function move(deltaX,deltaY){
     break;
     case 3:
     case 5:
+    // 木箱を置くところ（level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]）が0、または2であるとき
+    // 0=床　2=穴
         if(level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==0 ||
            level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==2){
             level[playerPosition.y][playerPosition.x]-=4;
@@ -188,7 +190,7 @@ function move(deltaX,deltaY){
     }
     complete_check()      //クリアの確認
 }
-    function reset(){
+    function resets(){
       for (var i = 0; i < 7; i++){
         for (var j = 0; j < 7; j++){
           switch (level[i][j]) {
@@ -219,12 +221,17 @@ function move(deltaX,deltaY){
     }
   }
   console.log(gameclear);
+  // game_fがClearCountと同じであれば
   if (game_f == ClearCount){
     stage = stage + 1;
     if (audioEngine.isMusicPlaying()) {
       audioEngine.stopMusic();
     }
-    cc.director.runScene(new gameclear());
+    //gameclearへ移動
+    //cc.director.runScene(new gameclear());
+    // gameclearへ移動しながら、シャッターみたいに上から画面が比較的ゆっくり変わる
+    var gc = cc.TransitionFadeDown.create(1, new gameclear());
+    cc.director.runScene(gc);
     if(stage == 4){
       stage = 1;
   }
